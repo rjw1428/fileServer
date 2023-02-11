@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { FileInfo } from 'src/model/file-info';
 import { FileSizePipe } from 'src/pipes/file-size.pipe';
 
@@ -8,8 +9,7 @@ import { FileSizePipe } from 'src/pipes/file-size.pipe';
   providedIn: 'root'
 })
 export class FileService {
-  // uri = "http://test.ryanwilk.com"
-  uri = 'http://localhost:4200'
+  uri = environment.apiUrl
   filesizePipe = new FileSizePipe()
   constructor(private http: HttpClient) { }
 
@@ -41,9 +41,10 @@ export class FileService {
   }
 
   mediaType(filename: string) {
-    if (filename.endsWith('.mp4'))
+    const name = filename.toLowerCase()
+    if (name.endsWith('.mp4'))
       return 'video'
-    if (filename.endsWith('.jpg') || filename.endsWith('.jpeg') || filename.endsWith('.gif') || filename.endsWith('.png'))
+    if (name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.gif') || name.endsWith('.png'))
       return 'image'
     else
       return 'unknown'

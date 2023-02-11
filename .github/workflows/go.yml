@@ -21,8 +21,17 @@ jobs:
       with:
         go-version: 1.19
 
-    - name: Build
+    - name: Set up Node
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Build Server
       run: go build -v ./...
+
+    - name: Build Client
+      run: cd client && npm run build
+
 
 #     - name: Test
 #       run: go test -v ./...

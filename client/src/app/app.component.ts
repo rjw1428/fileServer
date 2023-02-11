@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { BehaviorSubject, startWith, Subject, switchMap } from 'rxjs';
+import { BehaviorSubject, map, startWith, Subject, switchMap, take } from 'rxjs';
 import { FileInfo } from 'src/model/file-info';
 import { FileService } from './file.service';
 
@@ -18,16 +18,28 @@ export class AppComponent {
   constructor(private fileService: FileService) {
   }
 
-  loadNext(file: {name: string, is_dir: boolean, path: any, mediaType: string}, event: Event) {
+  loadNext(file: {name: string, is_dir: boolean, path: any, mediaType: string} | null, event: Event) {
     event.preventDefault()
     this.selectedFile$.next()
+    if (!file) {
+      return this.path$.next('')
+    }
     if (file.is_dir) {
       this.path$.next(file.path+'/'+file.name)
     }
     else {
       this.selectedFile$.next(file)
-      console.log(file)
     }
+  }
+
+  goBack() {
+    this.path$.pipe(
+      take(1),
+      map(path => {
+        const seg = path.split('/')
+        return seg.slice(0, seg.length - 1).join('/')
+      })
+    ).subscribe(backPath => this.path$.next(backPath))
   }
 
   getFileSource(file: {name: string, path: any, mediaType: string}) {

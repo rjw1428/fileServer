@@ -1,10 +1,11 @@
 <input type="file" multiple (change)="uploadFile($event)">
-
+<button (click)="goBack()">Return</button>
+<p>PATH: {{path$ | async}}</p>
 <div style="display: flex;">
-  <ul style="list-style-type: none; flex: 100%">
+  <ul style="list-style-type: none; flex: 0 0 50%;  height: 90vh; overflow-y: scroll;">
     <li *ngFor="let file of fileList$ | async">
-      <a href="#" (click)="loadNext(file, $event)">{{file.name}}</a>
-      <pre>{{ file | json}}</pre>
+      <a href="#" (click)="loadNext(file, $event)">{{file.name}} <small *ngIf="!file.is_dir">({{file.size}})</small></a>
+      <!-- <pre>{{ file | json}}</pre> -->
     </li>
   </ul>
   
