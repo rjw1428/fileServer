@@ -73,9 +73,6 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	type response struct {
-		Success bool `json:"success"`
-	}
-	resp := &response{Success: true}
+	resp := &utils.Response{Success: true}
 	json.NewEncoder(w).Encode(resp)
 }

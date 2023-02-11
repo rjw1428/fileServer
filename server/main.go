@@ -27,6 +27,7 @@ func main() {
 	mux.HandleFunc(fmt.Sprintf("/api/%s/files", utils.API_VERSION), fileHandlers.ListFilesHandler)
 	mux.HandleFunc(fmt.Sprintf("/api/%s/download", utils.API_VERSION), fileHandlers.DownloadFileHandler)
 	mux.HandleFunc(fmt.Sprintf("/api/%s/upload", utils.API_VERSION), fileHandlers.UploadFileHandler)
+	mux.HandleFunc(fmt.Sprintf("/api/%s/createFolder", utils.API_VERSION), fileHandlers.CreateFolderHandler)
 
 	handler := cors.Handler(mux)
 

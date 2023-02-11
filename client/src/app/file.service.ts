@@ -15,7 +15,7 @@ export class FileService {
 
   getFilelist(path: string = '') {
     return this.http.get<FileInfo[]>(`${this.uri}/api/v1/files?path=${path}`).pipe(
-      map(files => files
+      map(files => (files || [])
         .filter(file => !file.name.startsWith('.') && !file.name.startsWith('$'))
         .map(file => ({
           ...file,
@@ -27,11 +27,6 @@ export class FileService {
     )
   }
 
-
-  // getFile(filename: string, path: string) {
-  //   return this.http.get(`${this.uri}/api/v1/download?$`)
-  // }
-
   getFileSource(filename: string, path: string) {
     return `${this.uri}/api/v1/download?path=${encodeURIComponent(path)}&file=${encodeURIComponent(filename)}`
   }
@@ -40,10 +35,16 @@ export class FileService {
     return this.http.post(`${this.uri}/api/v1/upload`, form)
   }
 
+  createFolder(folderName: string, path: string) {
+    return this.http.get<{success: Boolean}>(`${this.uri}/api/v1/createFolder?path=${encodeURIComponent(path)}&file=${encodeURIComponent(folderName)}`)
+  }
+
   mediaType(filename: string) {
     const name = filename.toLowerCase()
-    if (name.endsWith('.mp4'))
+    if (name.endsWith('.mp4') || name.endsWith('.avi')) // avi doesnt play
       return 'video'
+    if (name.endsWith('.mp3'))
+      return 'audio'
     if (name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.gif') || name.endsWith('.png'))
       return 'image'
     else

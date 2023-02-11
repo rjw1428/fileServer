@@ -1,6 +1,9 @@
 <input type="file" multiple (change)="uploadFile($event)">
-<button (click)="goBack()">Return</button>
+
+<input type="text" #input>
+<button (click)="createFolder(input.value); input.value=''">Create Folder</button>
 <p>PATH: {{path$ | async}}</p>
+<button (click)="goBack()">Return</button>
 <div style="display: flex;">
   <ul style="list-style-type: none; flex: 0 0 50%;  height: 90vh; overflow-y: scroll;">
     <li *ngFor="let file of fileList$ | async">
@@ -10,7 +13,8 @@
   </ul>
   
   <div style="flex: 100%; height: 100vh" *ngIf="selectedFile$ | async as selectedFile">
+    <h1 *ngIf="selectedFile">{{selectedFile.name}}</h1>
     <img style="width: 100%; height: auto" [src]="getFileSource(selectedFile)" *ngIf="selectedFile && selectedFile.mediaType === 'image'">
-    <video style="width: 100%; height: auto" [src]="getFileSource(selectedFile)" [autoplay]="false" controls [muted]="true" *ngIf="selectedFile && selectedFile.mediaType === 'video'"></video>
+    <video style="width: 100%; height: auto" [src]="getFileSource(selectedFile)" [autoplay]="false" controls [muted]="false" *ngIf="selectedFile && (['video', 'audio'].includes(selectedFile.mediaType))"></video>
   </div>
 </div>

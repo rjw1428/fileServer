@@ -11,6 +11,10 @@ type Progress struct {
 	BytesRead int64
 }
 
+type Response struct {
+	Success bool `json:"success"`
+}
+
 func GetFileLocation(r *http.Request) (string, string) {
 	subPath := r.URL.Query().Get("path")
 	fileName := r.URL.Query().Get("file")
