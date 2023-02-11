@@ -1,0 +1,15 @@
+<input type="file" multiple (change)="uploadFile($event)">
+
+<div style="display: flex;">
+  <ul style="list-style-type: none; flex: 100%">
+    <li *ngFor="let file of fileList$ | async">
+      <a href="#" (click)="loadNext(file, $event)">{{file.name}}</a>
+      <pre>{{ file | json}}</pre>
+    </li>
+  </ul>
+  
+  <div style="flex: 100%; height: 100vh" *ngIf="selectedFile$ | async as selectedFile">
+    <img style="width: 100%; height: auto" [src]="getFileSource(selectedFile)" *ngIf="selectedFile && selectedFile.mediaType === 'image'">
+    <video style="width: 100%; height: auto" [src]="getFileSource(selectedFile)" [autoplay]="false" controls [muted]="true" *ngIf="selectedFile && selectedFile.mediaType === 'video'"></video>
+  </div>
+</div>
