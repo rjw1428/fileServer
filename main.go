@@ -8,8 +8,11 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/rs/cors"
 )
 
+// const path = "C:/Users/rjw14/Documents/"
 const path = "/media/pi/Crucial X6/"
 const apiVersion = "v1"
 const port = 1428
@@ -17,14 +20,29 @@ const MAX_UPLOAD_SIZE = 1024 * 1024 * 1024 * 10
 
 func main() {
 	log.Printf("Starting...")
-	http.HandleFunc(fmt.Sprintf("/api/%s/files", apiVersion), listFilesHandler)
-	http.HandleFunc(fmt.Sprintf("/api/%s/download", apiVersion), downloadFileHandler)
-	http.HandleFunc(fmt.Sprintf("/api/%s/upload", apiVersion), uploadFileHandler)
 
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	mux := http.NewServeMux()
+	cors := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{
+			http.MethodPost,
+			http.MethodGet,
+		},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: false,
+	})
+
+	mux.HandleFunc(fmt.Sprintf("/api/%s/files", apiVersion), listFilesHandler)
+	mux.HandleFunc(fmt.Sprintf("/api/%s/download", apiVersion), downloadFileHandler)
+	mux.HandleFunc(fmt.Sprintf("/api/%s/upload", apiVersion), uploadFileHandler)
+
+	handler := cors.Handler(mux)
+
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), handler)
 	if err != nil {
 		log.Println("Error starting server:", err)
 	}
+
 }
 
 func listFilesHandler(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +50,7 @@ func listFilesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not supported", http.StatusBadRequest)
 		return
 	}
-
+	log.Println("RemoteAddress: " + r.RemoteAddr)
 	requestedPath, _ := getFileLocation(r)
 	log.Println("Requesting files from", requestedPath)
 	files, err := os.ReadDir(requestedPath)
@@ -61,9 +79,8 @@ func listFilesHandler(w http.ResponseWriter, r *http.Request) {
 			ModTime: info.ModTime().Unix(),
 		})
 	}
-
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode((fileNames))
+	json.NewEncoder(w).Encode(fileNames)
 }
 
 func downloadFileHandler(w http.ResponseWriter, r *http.Request) {
@@ -147,8 +164,13 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "File uploaded successfully")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	type response struct {
+		Success bool `json:"success"`
+	}
+	resp := &response{Success: true}
+	json.NewEncoder(w).Encode(resp)
 }
 
 // UTILITY FUNCTIONS
