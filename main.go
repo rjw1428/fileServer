@@ -28,11 +28,12 @@ func main() {
 }
 
 func listFilesHandler(w http.ResponseWriter, r *http.Request) {
-	requestedPath, _, err := getFileLocation(r)
-	if err != nil {
-		http.Error(w, "Unable to read subpath, make sure if there is no subpath being sent, the body contains an empty array", http.StatusBadRequest)
+	if r.Method != "GET" {
+		http.Error(w, "Method not supported", http.StatusBadRequest)
 		return
 	}
+
+	requestedPath, _ := getFileLocation(r)
 	log.Println("Requesting files from", requestedPath)
 	files, err := os.ReadDir(requestedPath)
 	if err != nil {
@@ -66,13 +67,14 @@ func listFilesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func downloadFileHandler(w http.ResponseWriter, r *http.Request) {
-	requestedFile, fileName, err := getFileLocation(r)
-	if err != nil {
-		http.Error(w, "Unable to read subpath, make sure if there is no subpath being sent, the body contains an empty array", http.StatusBadRequest)
+	if r.Method != "GET" {
+		http.Error(w, "Method not supported", http.StatusBadRequest)
 		return
 	}
-	log.Println("Returning file", requestedFile)
-	file, err := os.Open(requestedFile)
+
+	requestedPath, fileName := getFileLocation(r)
+	log.Println("Returning file", requestedPath+"/"+fileName)
+	file, err := os.Open(requestedPath + "/" + fileName)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Error getting file", http.StatusInternalServerError)
@@ -82,7 +84,7 @@ func downloadFileHandler(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	w.Header().Set("Content-Disposition", "attachment: filename="+fileName)
-	http.ServeFile(w, r, requestedFile)
+	http.ServeFile(w, r, requestedPath+"/"+fileName)
 }
 
 func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
@@ -150,22 +152,11 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UTILITY FUNCTIONS
-func getFileLocation(r *http.Request) (string, string, error) {
-	var subFolders []string
-	err := json.NewDecoder(r.Body).Decode(&subFolders)
-	if err != nil {
-		return "", "", err
-	}
-	var fileName string
-	if len(subFolders) > 0 {
-		fileName = subFolders[len(subFolders)-1]
-	}
-
-	requestedFile := path
-	for _, subFolder := range subFolders {
-		requestedFile = filepath.Join(requestedFile, subFolder)
-	}
-	return requestedFile, fileName, nil
+func getFileLocation(r *http.Request) (string, string) {
+	subPath := r.URL.Query().Get("path")
+	fileName := r.URL.Query().Get("file")
+	requestedFile := filepath.Join(path, subPath)
+	return requestedFile, fileName
 }
 
 type Progress struct {
