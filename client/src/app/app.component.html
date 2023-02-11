@@ -7,7 +7,7 @@
 <div style="display: flex;">
   <ul style="list-style-type: none; flex: 0 0 50%;  height: 90vh; overflow-y: scroll;">
     <li *ngFor="let file of fileList$ | async">
-      <a href="#" (click)="loadNext(file, $event)">{{file.name}} <small *ngIf="!file.is_dir">({{file.size}})</small></a>
+      <a href="/" (click)="loadNext(file, $event)">{{file.name}} <small *ngIf="!file.is_dir">({{file.size}})</small></a>
       <!-- <pre>{{ file | json}}</pre> -->
     </li>
   </ul>
@@ -16,5 +16,6 @@
     <h1 *ngIf="selectedFile">{{selectedFile.name}}</h1>
     <img style="width: 100%; height: auto" [src]="getFileSource(selectedFile)" *ngIf="selectedFile && selectedFile.mediaType === 'image'">
     <video style="width: 100%; height: auto" [src]="getFileSource(selectedFile)" [autoplay]="false" controls [muted]="false" *ngIf="selectedFile && (['video', 'audio'].includes(selectedFile.mediaType))"></video>
+    <a *ngIf="selectedFile" [href]="getFileSource(selectedFile)" [download]="selectedFile.name">Download</a>
   </div>
 </div>
