@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-const path = "C:/Users/rjw14/Documents/"
+const path = "/media/pi/Crucial X6/"
 const apiVersion = "v1"
 const port = 1428
 const MAX_UPLOAD_SIZE = 1024 * 1024 * 1024 * 10
