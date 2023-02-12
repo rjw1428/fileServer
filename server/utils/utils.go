@@ -36,6 +36,6 @@ func (pr *Progress) Print() {
 		fmt.Println("DONE!")
 		return
 	}
-
-	fmt.Printf("File upload in progress: %d\n", pr.BytesRead)
+	var percent = float32(pr.BytesRead) / float32(pr.TotalSize) * 100
+	fmt.Printf("File upload in progress: %.2f %%\n", percent)
 }

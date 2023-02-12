@@ -54,7 +54,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		filePath := filepath.Join(utils.ROOT_DIR, path, fileHeader.Filename)
-		log.Printf("Uploading file %s to %s", fileHeader.Filename, utils.ROOT_DIR)
+		log.Printf("Uploading file %s to %s", fileHeader.Filename, filePath)
 		out, err := os.Create(filePath)
 		if err != nil {
 			http.Error(w, "Error creating file", http.StatusInternalServerError)
