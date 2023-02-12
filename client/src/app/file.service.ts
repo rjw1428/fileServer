@@ -41,7 +41,7 @@ export class FileService {
 
   mediaType(filename: string) {
     const name = filename.toLowerCase()
-    if (name.endsWith('.mp4') || name.endsWith('.avi')) // avi doesnt play
+    if (name.endsWith('.mp4'))
       return 'video'
     if (name.endsWith('.mp3'))
       return 'audio'

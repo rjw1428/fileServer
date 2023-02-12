@@ -25,6 +25,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files := r.MultipartForm.File["file"]
+	path := r.MultipartForm.Value["path"][0]
 	for _, fileHeader := range files {
 		if fileHeader.Size > utils.MAX_UPLOAD_SIZE {
 			http.Error(w, fmt.Sprint("The uploaded file is too big. Please keep file size to less than 10 GB.", fileHeader.Filename), http.StatusBadRequest)
@@ -52,7 +53,7 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		filePath := filepath.Join(utils.ROOT_DIR, fileHeader.Filename)
+		filePath := filepath.Join(utils.ROOT_DIR, path, fileHeader.Filename)
 		log.Printf("Uploading file %s to %s", fileHeader.Filename, utils.ROOT_DIR)
 		out, err := os.Create(filePath)
 		if err != nil {

@@ -72,7 +72,17 @@ export class AppComponent {
       const file = files.item(i)!
       const formData = new FormData();
       formData.append('file', file)
-      this.fileService.uploadFile(formData).subscribe(console.log)
+      this.path$.pipe(
+        take(1),
+        switchMap(path => {
+          formData.append('path', path)
+          return this.fileService.uploadFile(formData).pipe(
+            tap(console.log),
+            filter(resp => !!resp.success),
+            map(() => path),
+          )
+        })
+      ).subscribe(path => this.path$.next(path))
     }
   }
 
@@ -85,6 +95,6 @@ export class AppComponent {
         map(() => path)
       ))
     ).subscribe(path => this.path$.next(path))
-    
+
   }
 }
